@@ -59,3 +59,4 @@ FinanceTracker.Web/node_modules/
 FinanceTracker.Web/dist/
 FinanceTracker.Web/.env
 FinanceTracker.Web/.env.*
+FinanceTracker.Web/.env.local

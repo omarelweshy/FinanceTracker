@@ -7,10 +7,42 @@ services:
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: financetracker
     ports:
-      - "5433:5433"
+      - "5433:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  api:
+    build:
+      context: .
+      dockerfile: FinanceTracker.Api/Dockerfile
+    container_name: financetracker_api
+    ports:
+      - "8080:8080"
+    environment:
+      ConnectionStrings__DefaultConnection: "Host=postgres;Port=5432;Database=financetracker;Username=postgres;Password=postgres;SSL Mode=Disable"
+      Jwt__Key: "super-secret-key-change-in-production-min-32-chars!!"
+      Jwt__Issuer: "FinanceTracker"
+      Jwt__Audience: "FinanceTracker"
+      Jwt__ExpiresInHours: "24"
+      ASPNETCORE_URLS: "http://+:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  web:
+    build:
+      context: FinanceTracker.Web
+      dockerfile: Dockerfile
+    container_name: financetracker_web
+    ports:
+      - "3000:80"
+    depends_on:
+      - api
 
 volumes:
   postgres_data:
-
