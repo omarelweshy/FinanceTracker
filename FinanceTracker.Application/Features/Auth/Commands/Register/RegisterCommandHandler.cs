@@ -12,12 +12,15 @@ public class RegisterCommandHandler : IRequestHandler<RegisterCommand, AuthRespo
     private readonly IUserRepository _userRepository;
     private readonly IPasswordHasher _passwordHasher;
     private readonly ITokenService _tokenService;
+    private readonly ICategorySeeder _categorySeeder;
 
-    public RegisterCommandHandler(IUserRepository userRepository, IPasswordHasher passwordHasher, ITokenService tokenService)
+    public RegisterCommandHandler(IUserRepository userRepository, IPasswordHasher passwordHasher,
+        ITokenService tokenService, ICategorySeeder categorySeeder)
     {
         _userRepository = userRepository;
         _passwordHasher = passwordHasher;
         _tokenService = tokenService;
+        _categorySeeder = categorySeeder;
     }
 
     public async Task<AuthResponse> Handle(RegisterCommand request, CancellationToken cancellationToken)
@@ -29,6 +32,7 @@ public class RegisterCommandHandler : IRequestHandler<RegisterCommand, AuthRespo
         var user = User.Create(request.Email, request.FullName, passwordHash, request.Currency);
 
         await _userRepository.AddAsync(user);
+        await _categorySeeder.SeedAsync(user.Id);
 
         var token = _tokenService.GenerateToken(user);
         return new AuthResponse(user.Id, user.Email, user.FullName, user.Currency, token);

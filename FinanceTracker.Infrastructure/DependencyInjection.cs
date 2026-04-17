@@ -30,6 +30,7 @@ public static class DependencyInjection
 
         var jwtSettings = configuration.GetSection("Jwt").Get<JwtSettings>()!;
         services.AddSingleton(jwtSettings);
+        services.AddScoped<ICategorySeeder, CategorySeeder>();
         services.AddSingleton<IPasswordHasher, PasswordHasher>();
         services.AddSingleton<ITokenService, TokenService>();
 
