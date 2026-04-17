@@ -1,4 +1,5 @@
 using System.Text;
+using Dapper;
 using FinanceTracker.Application.Interfaces;
 using FinanceTracker.Domain.Interfaces;
 using FinanceTracker.Infrastructure.Database;
@@ -15,6 +16,8 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddInfrastructure(this IServiceCollection services, string connectionString, IConfiguration configuration)
     {
+        DefaultTypeMap.MatchNamesWithUnderscores = true;
+
         services.AddSingleton<IDbConnectionFactory>(_ => new DbConnectionFactory(connectionString));
 
         services.AddScoped<IUserRepository, UserRepository>();
