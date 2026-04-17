@@ -38,6 +38,12 @@ public class Account
         Balance += amount;
     }
 
+    public void Update(string name, AccountType type)
+    {
+        Name = name;
+        Type = type;
+    }
+
     public void Deactivate()
     {
         IsActive = false;

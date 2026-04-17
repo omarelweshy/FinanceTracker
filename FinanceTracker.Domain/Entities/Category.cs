@@ -30,6 +30,12 @@ public class Category
         };
     }
 
+    public void Update(string name, string? icon)
+    {
+        Name = name;
+        Icon = icon;
+    }
+
     public static Category CreateDefault(string name, CategoryType type, string? icon = null)
     {
         return new Category

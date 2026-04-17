@@ -33,5 +33,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapAuthEndpoints();
+app.MapAccountEndpoints();
+app.MapCategoryEndpoints();
 
 app.Run();
