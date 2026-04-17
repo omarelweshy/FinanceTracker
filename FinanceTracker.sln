@@ -4,6 +4,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FinanceTracker.Api", "Finan
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FinanceTracker.Domain", "FinanceTracker.Domain\FinanceTracker.Domain.csproj", "{6A51542B-C294-4443-A86B-C67DA5780835}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FinanceTracker.Application", "FinanceTracker.Application\FinanceTracker.Application.csproj", "{617E0BCD-A8E5-441E-AEF8-7094E3F4E8CE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FinanceTracker.Infrastructure", "FinanceTracker.Infrastructure\FinanceTracker.Infrastructure.csproj", "{27941E78-B3BC-477D-9A13-01C28B78E184}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -38,6 +42,30 @@ Global
 		{6A51542B-C294-4443-A86B-C67DA5780835}.Release|x64.Build.0 = Release|Any CPU
 		{6A51542B-C294-4443-A86B-C67DA5780835}.Release|x86.ActiveCfg = Release|Any CPU
 		{6A51542B-C294-4443-A86B-C67DA5780835}.Release|x86.Build.0 = Release|Any CPU
+		{617E0BCD-A8E5-441E-AEF8-7094E3F4E8CE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{617E0BCD-A8E5-441E-AEF8-7094E3F4E8CE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{617E0BCD-A8E5-441E-AEF8-7094E3F4E8CE}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{617E0BCD-A8E5-441E-AEF8-7094E3F4E8CE}.Debug|x64.Build.0 = Debug|Any CPU
+		{617E0BCD-A8E5-441E-AEF8-7094E3F4E8CE}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{617E0BCD-A8E5-441E-AEF8-7094E3F4E8CE}.Debug|x86.Build.0 = Debug|Any CPU
+		{617E0BCD-A8E5-441E-AEF8-7094E3F4E8CE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{617E0BCD-A8E5-441E-AEF8-7094E3F4E8CE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{617E0BCD-A8E5-441E-AEF8-7094E3F4E8CE}.Release|x64.ActiveCfg = Release|Any CPU
+		{617E0BCD-A8E5-441E-AEF8-7094E3F4E8CE}.Release|x64.Build.0 = Release|Any CPU
+		{617E0BCD-A8E5-441E-AEF8-7094E3F4E8CE}.Release|x86.ActiveCfg = Release|Any CPU
+		{617E0BCD-A8E5-441E-AEF8-7094E3F4E8CE}.Release|x86.Build.0 = Release|Any CPU
+		{27941E78-B3BC-477D-9A13-01C28B78E184}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{27941E78-B3BC-477D-9A13-01C28B78E184}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{27941E78-B3BC-477D-9A13-01C28B78E184}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{27941E78-B3BC-477D-9A13-01C28B78E184}.Debug|x64.Build.0 = Debug|Any CPU
+		{27941E78-B3BC-477D-9A13-01C28B78E184}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{27941E78-B3BC-477D-9A13-01C28B78E184}.Debug|x86.Build.0 = Debug|Any CPU
+		{27941E78-B3BC-477D-9A13-01C28B78E184}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{27941E78-B3BC-477D-9A13-01C28B78E184}.Release|Any CPU.Build.0 = Release|Any CPU
+		{27941E78-B3BC-477D-9A13-01C28B78E184}.Release|x64.ActiveCfg = Release|Any CPU
+		{27941E78-B3BC-477D-9A13-01C28B78E184}.Release|x64.Build.0 = Release|Any CPU
+		{27941E78-B3BC-477D-9A13-01C28B78E184}.Release|x86.ActiveCfg = Release|Any CPU
+		{27941E78-B3BC-477D-9A13-01C28B78E184}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
