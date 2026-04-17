@@ -53,3 +53,9 @@ publish/
 # Logs
 logs/
 *.log
+
+# React / Node
+FinanceTracker.Web/node_modules/
+FinanceTracker.Web/dist/
+FinanceTracker.Web/.env
+FinanceTracker.Web/.env.*

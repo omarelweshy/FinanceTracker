@@ -19,6 +19,11 @@ builder.Services.AddInfrastructure(connectionString, builder.Configuration);
 
 builder.Services.AddOpenApi();
 
+builder.Services.AddCors(options => options.AddDefaultPolicy(policy =>
+    policy.WithOrigins("*")
+        .AllowAnyHeader()
+        .AllowAnyMethod()));
+
 var app = builder.Build();
 
 app.UseMiddleware<ErrorHandlingMiddleware>();
@@ -29,6 +34,7 @@ app.MapScalarApiReference(options => options
     .WithDefaultHttpClient(ScalarTarget.CSharp, ScalarClient.HttpClient)
     .WithHttpBearerAuthentication(bearer => bearer.Token = string.Empty));
 
+app.UseCors();
 app.UseAuthentication();
 app.UseAuthorization();
 
