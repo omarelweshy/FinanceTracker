@@ -10,7 +10,10 @@ public class DatabaseMigrator
 
         var upgrader = DeployChanges.To
             .PostgresqlDatabase(connectionString)
-            .WithScriptsEmbeddedInAssembly(typeof(DatabaseMigrator).Assembly)
+            .WithScriptsEmbeddedInAssembly(
+                typeof(DatabaseMigrator).Assembly,
+                s => s.StartsWith("FinanceTracker.Infrastructure.Database.Scripts."))
+            .WithVariablesDisabled()
             .WithTransaction()
             .LogToConsole()
             .Build();

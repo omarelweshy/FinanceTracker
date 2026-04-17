@@ -1,15 +1,17 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <ItemGroup>
-        <ProjectReference Include="..\FinanceTracker.Application\FinanceTracker.Application.csproj"/>
+        <ProjectReference Include="..\FinanceTracker.Application\FinanceTracker.Application.csproj" />
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Dapper" Version="2.1.72"/>
-        <PackageReference Include="dbup-postgresql" Version="7.0.1"/>
-        <PackageReference Include="Npgsql" Version="10.0.2"/>
-        <EmbeddedResource Include="Database/Scripts/**/*.sql"/>
-        <EmbeddedResource Include="Database/Sql/**/*.sql"/>
+        <PackageReference Include="BCrypt.Net-Next" Version="4.1.0" />
+        <PackageReference Include="Dapper" Version="2.1.72" />
+        <PackageReference Include="dbup-postgresql" Version="7.0.1" />
+        <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.6" />
+        <PackageReference Include="Npgsql" Version="10.0.2" />
+        <EmbeddedResource Include="Database/Scripts/**/*.sql" />
+        <EmbeddedResource Include="Database/Sql/**/*.sql" />
     </ItemGroup>
 
     <PropertyGroup>

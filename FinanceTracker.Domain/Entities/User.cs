@@ -24,4 +24,9 @@ public class User
         };                                                
     }
 
+    public void UpdateProfile(string fullName, string currency)
+    {
+        FullName = fullName;
+        Currency = currency;
+    }
 }

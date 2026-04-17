@@ -1,3 +1,5 @@
+using FinanceTracker.Api.Endpoints;
+using FinanceTracker.Application;
 using FinanceTracker.Infrastructure;
 using FinanceTracker.Infrastructure.Migrations;
 
@@ -7,10 +9,14 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
 
 DatabaseMigrator.Run(connectionString);
 
-builder.Services.AddInfrastructure(connectionString);
+builder.Services.AddApplication();
+builder.Services.AddInfrastructure(connectionString, builder.Configuration);
 
 var app = builder.Build();
 
-app.MapGet("/", () => "Hello World!");
+app.UseAuthentication();
+app.UseAuthorization();
+
+app.MapAuthEndpoints();
 
 app.Run();
