@@ -13,16 +13,14 @@ public class RegisterCommandHandler : IRequestHandler<RegisterCommand, AuthRespo
     private readonly IUserRepository _userRepository;
     private readonly IPasswordHasher _passwordHasher;
     private readonly ITokenService _tokenService;
-    private readonly ICategorySeeder _categorySeeder;
     private readonly IEventBus _eventBus;
 
     public RegisterCommandHandler(IUserRepository userRepository, IPasswordHasher passwordHasher,
-        ITokenService tokenService, ICategorySeeder categorySeeder, IEventBus eventBus)
+        ITokenService tokenService, IEventBus eventBus)
     {
         _userRepository = userRepository;
         _passwordHasher = passwordHasher;
         _tokenService = tokenService;
-        _categorySeeder = categorySeeder;
         _eventBus = eventBus;
     }
 
@@ -35,7 +33,6 @@ public class RegisterCommandHandler : IRequestHandler<RegisterCommand, AuthRespo
         var user = User.Create(request.Email, request.FullName, passwordHash, request.Currency);
 
         await _userRepository.AddAsync(user);
-        await _categorySeeder.SeedAsync(user.Id);
         await _eventBus.PublishAsync(new UserRegisteredEvent(user.Id, user.Email, user.FullName, user.Currency), cancellationToken);
 
         var token = _tokenService.GenerateToken(user);

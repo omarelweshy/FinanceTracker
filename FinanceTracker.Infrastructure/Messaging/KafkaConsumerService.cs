@@ -1,4 +1,8 @@
+using System.Text.Json;
 using Confluent.Kafka;
+using FinanceTracker.Application.Interfaces;
+using FinanceTracker.Domain.Events;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
@@ -7,26 +11,24 @@ namespace FinanceTracker.Infrastructure.Messaging;
 public class KafkaConsumerService : BackgroundService
 {
     private readonly KafkaSettings _settings;
+    private readonly IServiceScopeFactory _scopeFactory;
     private readonly ILogger<KafkaConsumerService> _logger;
 
-    private static readonly string[] Topics =
-    [
-        "UserRegisteredEvent"
-    ];
+    private static readonly string[] Topics = ["UserRegisteredEvent"];
 
-    public KafkaConsumerService(KafkaSettings settings, ILogger<KafkaConsumerService> logger)
+    public KafkaConsumerService(KafkaSettings settings, IServiceScopeFactory scopeFactory, ILogger<KafkaConsumerService> logger)
     {
         _settings = settings;
+        _scopeFactory = scopeFactory;
         _logger = logger;
     }
 
     protected override Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        // Run on a background thread so it doesn't block startup
-        return Task.Run(() => Consume(stoppingToken), stoppingToken);
+        return Task.Run(() => ConsumeLoop(stoppingToken), stoppingToken);
     }
 
-    private void Consume(CancellationToken stoppingToken)
+    private async Task ConsumeLoop(CancellationToken stoppingToken)
     {
         var config = new ConsumerConfig
         {
@@ -45,9 +47,10 @@ public class KafkaConsumerService : BackgroundService
             try
             {
                 var result = consumer.Consume(stoppingToken);
-                _logger.LogInformation(
-                    "Consumed [{Topic}] key={Key} | {Value}",
-                    result.Topic, result.Message.Key, result.Message.Value);
+                _logger.LogInformation("Consumed [{Topic}] key={Key}", result.Topic, result.Message.Key);
+
+                using var scope = _scopeFactory.CreateScope();
+                await DispatchAsync(result.Topic, result.Message.Value, scope.ServiceProvider, stoppingToken);
             }
             catch (OperationCanceledException)
             {
@@ -55,16 +58,32 @@ public class KafkaConsumerService : BackgroundService
             }
             catch (ConsumeException ex) when (ex.Error.Code == ErrorCode.UnknownTopicOrPart)
             {
-                // Topic auto-created on first publish; retry silently
                 Thread.Sleep(2000);
             }
-            catch (ConsumeException ex)
+            catch (Exception ex)
             {
-                _logger.LogError(ex, "Kafka consume error: {Reason}", ex.Error.Reason);
+                _logger.LogError(ex, "Kafka consumer error");
             }
         }
 
         consumer.Close();
         _logger.LogInformation("Kafka consumer stopped");
+    }
+
+    private async Task DispatchAsync(string topic, string json, IServiceProvider sp, CancellationToken ct)
+    {
+        switch (topic)
+        {
+            case "UserRegisteredEvent":
+                var @event = JsonSerializer.Deserialize<UserRegisteredEvent>(json,
+                    new JsonSerializerOptions { PropertyNameCaseInsensitive = true })!;
+                var handler = sp.GetRequiredService<IEventHandler<UserRegisteredEvent>>();
+                await handler.HandleAsync(@event, ct);
+                break;
+
+            default:
+                _logger.LogWarning("No handler registered for topic {Topic}", topic);
+                break;
+        }
     }
 }
