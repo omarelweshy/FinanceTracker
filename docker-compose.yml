@@ -22,7 +22,7 @@ services:
       dockerfile: FinanceTracker.Api/Dockerfile
     container_name: financetracker_api
     ports:
-      - "8080:8080"
+      - "8081:8080"
     environment:
       ConnectionStrings__DefaultConnection: "Host=postgres;Port=5432;Database=financetracker;Username=postgres;Password=postgres;SSL Mode=Disable"
       Jwt__Key: "super-secret-key-change-in-production-min-32-chars!!"
