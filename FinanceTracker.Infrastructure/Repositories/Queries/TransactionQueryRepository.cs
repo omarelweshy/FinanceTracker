@@ -27,7 +27,7 @@ public class TransactionQueryRepository : ITransactionQuery
             UserId = userId,
             filter.AccountId,
             filter.CategoryId,
-            Type = filter.Type?.ToString(),
+            Type = filter.Type.HasValue ? ((int)filter.Type.Value).ToString() : null,
             filter.From,
             filter.To,
             filter.PageSize,
