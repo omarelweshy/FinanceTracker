@@ -8,56 +8,41 @@ namespace FinanceTracker.Infrastructure.Repositories;
 
 public class TransactionRepository : ITransactionRepository
 {
-    private readonly IDbConnectionFactory _connectionFactory;
+    private readonly IDbSession _session;
 
-    public TransactionRepository(IDbConnectionFactory connectionFactory)
-    {
-        _connectionFactory = connectionFactory;
-    }
+    public TransactionRepository(IDbSession session) => _session = session;
 
-    public async Task<Transaction?> GetByIdAsync(Guid id)
-    {
-        using var connection = _connectionFactory.CreateConnection();
-        return await connection.QueryFirstOrDefaultAsync<Transaction>(SqlLoader.Load("Transactions.GetById"), new { Id = id });
-    }
+    public Task<Transaction?> GetByIdAsync(Guid id) =>
+        _session.Connection.QueryFirstOrDefaultAsync<Transaction>(
+            SqlLoader.Load("Transactions.GetById"), new { Id = id }, _session.Transaction);
 
-    public async Task<IEnumerable<Transaction>> GetByAccountIdAsync(Guid accountId)
-    {
-        using var connection = _connectionFactory.CreateConnection();
-        return await connection.QueryAsync<Transaction>(SqlLoader.Load("Transactions.GetByAccountId"), new { AccountId = accountId });
-    }
+    public Task<IEnumerable<Transaction>> GetByAccountIdAsync(Guid accountId) =>
+        _session.Connection.QueryAsync<Transaction>(
+            SqlLoader.Load("Transactions.GetByAccountId"), new { AccountId = accountId }, _session.Transaction);
 
-    public async Task<IEnumerable<Transaction>> GetFilteredAsync(Guid userId, TransactionFilter filter)
-    {
-        using var connection = _connectionFactory.CreateConnection();
-        return await connection.QueryAsync<Transaction>(SqlLoader.Load("Transactions.GetFiltered"), new
-        {
-            UserId = userId,
-            filter.AccountId,
-            filter.CategoryId,
-            Type = filter.Type?.ToString(),
-            filter.From,
-            filter.To,
-            filter.PageSize,
-            Offset = (filter.Page - 1) * filter.PageSize
-        });
-    }
+    public Task<IEnumerable<Transaction>> GetFilteredAsync(Guid userId, TransactionFilter filter) =>
+        _session.Connection.QueryAsync<Transaction>(
+            SqlLoader.Load("Transactions.GetFiltered"), new
+            {
+                UserId = userId,
+                filter.AccountId,
+                filter.CategoryId,
+                Type = filter.Type?.ToString(),
+                filter.From,
+                filter.To,
+                filter.PageSize,
+                Offset = (filter.Page - 1) * filter.PageSize
+            }, _session.Transaction);
 
-    public async Task AddAsync(Transaction transaction)
-    {
-        using var connection = _connectionFactory.CreateConnection();
-        await connection.ExecuteAsync(SqlLoader.Load("Transactions.Insert"), transaction);
-    }
+    public Task AddAsync(Transaction transaction) =>
+        _session.Connection.ExecuteAsync(
+            SqlLoader.Load("Transactions.Insert"), transaction, _session.Transaction);
 
-    public async Task UpdateAsync(Transaction transaction)
-    {
-        using var connection = _connectionFactory.CreateConnection();
-        await connection.ExecuteAsync(SqlLoader.Load("Transactions.Update"), transaction);
-    }
+    public Task UpdateAsync(Transaction transaction) =>
+        _session.Connection.ExecuteAsync(
+            SqlLoader.Load("Transactions.Update"), transaction, _session.Transaction);
 
-    public async Task DeleteAsync(Guid id)
-    {
-        using var connection = _connectionFactory.CreateConnection();
-        await connection.ExecuteAsync(SqlLoader.Load("Transactions.Delete"), new { Id = id });
-    }
+    public Task DeleteAsync(Guid id) =>
+        _session.Connection.ExecuteAsync(
+            SqlLoader.Load("Transactions.Delete"), new { Id = id }, _session.Transaction);
 }

@@ -8,34 +8,23 @@ namespace FinanceTracker.Infrastructure.Repositories;
 
 public class TransferRepository : ITransferRepository
 {
-    private readonly IDbConnectionFactory _connectionFactory;
+    private readonly IDbSession _session;
 
-    public TransferRepository(IDbConnectionFactory connectionFactory)
-    {
-        _connectionFactory = connectionFactory;
-    }
+    public TransferRepository(IDbSession session) => _session = session;
 
-    public async Task<Transfer?> GetByIdAsync(Guid id)
-    {
-        using var connection = _connectionFactory.CreateConnection();
-        return await connection.QueryFirstOrDefaultAsync<Transfer>(SqlLoader.Load("Transfers.GetById"), new { Id = id });
-    }
+    public Task<Transfer?> GetByIdAsync(Guid id) =>
+        _session.Connection.QueryFirstOrDefaultAsync<Transfer>(
+            SqlLoader.Load("Transfers.GetById"), new { Id = id }, _session.Transaction);
 
-    public async Task<IEnumerable<Transfer>> GetByUserIdAsync(Guid userId)
-    {
-        using var connection = _connectionFactory.CreateConnection();
-        return await connection.QueryAsync<Transfer>(SqlLoader.Load("Transfers.GetByUserId"), new { UserId = userId });
-    }
+    public Task<IEnumerable<Transfer>> GetByUserIdAsync(Guid userId) =>
+        _session.Connection.QueryAsync<Transfer>(
+            SqlLoader.Load("Transfers.GetByUserId"), new { UserId = userId }, _session.Transaction);
 
-    public async Task AddAsync(Transfer transfer)
-    {
-        using var connection = _connectionFactory.CreateConnection();
-        await connection.ExecuteAsync(SqlLoader.Load("Transfers.Insert"), transfer);
-    }
+    public Task AddAsync(Transfer transfer) =>
+        _session.Connection.ExecuteAsync(
+            SqlLoader.Load("Transfers.Insert"), transfer, _session.Transaction);
 
-    public async Task DeleteAsync(Guid id)
-    {
-        using var connection = _connectionFactory.CreateConnection();
-        await connection.ExecuteAsync(SqlLoader.Load("Transfers.Delete"), new { Id = id });
-    }
+    public Task DeleteAsync(Guid id) =>
+        _session.Connection.ExecuteAsync(
+            SqlLoader.Load("Transfers.Delete"), new { Id = id }, _session.Transaction);
 }

@@ -5,6 +5,8 @@ const navItems = [
   { to: '/', label: 'Dashboard', icon: '📊' },
   { to: '/accounts', label: 'Accounts', icon: '🏦' },
   { to: '/categories', label: 'Categories', icon: '🏷️' },
+  { to: '/transactions', label: 'Transactions', icon: '💸' },
+  { to: '/transfers', label: 'Transfers', icon: '↔️' },
 ]
 
 export default function Layout({ children }: { children: React.ReactNode }) {

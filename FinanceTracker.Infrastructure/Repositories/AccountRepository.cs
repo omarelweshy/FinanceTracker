@@ -8,52 +8,43 @@ namespace FinanceTracker.Infrastructure.Repositories;
 
 public class AccountRepository : IAccountRepository
 {
-    private readonly IDbConnectionFactory _connectionFactory;
+    private readonly IDbSession _session;
 
-    public AccountRepository(IDbConnectionFactory connectionFactory)
-    {
-        _connectionFactory = connectionFactory;
-    }
+    public AccountRepository(IDbSession session) => _session = session;
 
-    public async Task<Account?> GetByIdAsync(Guid id)
-    {
-        using var connection = _connectionFactory.CreateConnection();
-        return await connection.QueryFirstOrDefaultAsync<Account>(SqlLoader.Load("Accounts.GetById"), new { Id = id });
-    }
+    public Task<Account?> GetByIdAsync(Guid id) =>
+        _session.Connection.QueryFirstOrDefaultAsync<Account>(
+            SqlLoader.Load("Accounts.GetById"), new { Id = id }, _session.Transaction);
 
-    public async Task<IEnumerable<Account>> GetByUserIdAsync(Guid userId)
-    {
-        using var connection = _connectionFactory.CreateConnection();
-        return await connection.QueryAsync<Account>(SqlLoader.Load("Accounts.GetByUserId"), new { UserId = userId });
-    }
+    public Task<Account?> GetByIdForUpdateAsync(Guid id) =>
+        _session.Connection.QueryFirstOrDefaultAsync<Account>(
+            SqlLoader.Load("Accounts.GetByIdForUpdate"), new { Id = id }, _session.Transaction);
 
-    public async Task<bool> ExistsAsync(Guid userId, string name)
-    {
-        using var connection = _connectionFactory.CreateConnection();
-        return await connection.ExecuteScalarAsync<bool>(SqlLoader.Load("Accounts.Exists"), new { UserId = userId, Name = name });
-    }
+    public Task<IEnumerable<Account>> GetByUserIdAsync(Guid userId) =>
+        _session.Connection.QueryAsync<Account>(
+            SqlLoader.Load("Accounts.GetByUserId"), new { UserId = userId }, _session.Transaction);
 
-    public async Task<int> CountActiveAsync(Guid userId)
-    {
-        using var connection = _connectionFactory.CreateConnection();
-        return await connection.ExecuteScalarAsync<int>(SqlLoader.Load("Accounts.CountActive"), new { UserId = userId });
-    }
+    public Task<bool> ExistsAsync(Guid userId, string name) =>
+        _session.Connection.ExecuteScalarAsync<bool>(
+            SqlLoader.Load("Accounts.Exists"), new { UserId = userId, Name = name }, _session.Transaction);
 
-    public async Task AddAsync(Account account)
-    {
-        using var connection = _connectionFactory.CreateConnection();
-        await connection.ExecuteAsync(SqlLoader.Load("Accounts.Insert"), account);
-    }
+    public Task<int> CountActiveAsync(Guid userId) =>
+        _session.Connection.ExecuteScalarAsync<int>(
+            SqlLoader.Load("Accounts.CountActive"), new { UserId = userId }, _session.Transaction);
 
-    public async Task UpdateAsync(Account account)
-    {
-        using var connection = _connectionFactory.CreateConnection();
-        await connection.ExecuteAsync(SqlLoader.Load("Accounts.Update"), account);
-    }
+    public Task AddAsync(Account account) =>
+        _session.Connection.ExecuteAsync(
+            SqlLoader.Load("Accounts.Insert"), account, _session.Transaction);
 
-    public async Task DeleteAsync(Guid id)
-    {
-        using var connection = _connectionFactory.CreateConnection();
-        await connection.ExecuteAsync(SqlLoader.Load("Accounts.Delete"), new { Id = id });
-    }
+    public Task UpdateAsync(Account account) =>
+        _session.Connection.ExecuteAsync(
+            SqlLoader.Load("Accounts.Update"), account, _session.Transaction);
+
+    public Task UpdateBalanceAsync(Guid id, decimal balance) =>
+        _session.Connection.ExecuteAsync(
+            SqlLoader.Load("Accounts.UpdateBalance"), new { Id = id, Balance = balance }, _session.Transaction);
+
+    public Task DeleteAsync(Guid id) =>
+        _session.Connection.ExecuteAsync(
+            SqlLoader.Load("Accounts.Delete"), new { Id = id }, _session.Transaction);
 }

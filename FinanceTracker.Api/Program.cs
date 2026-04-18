@@ -19,6 +19,9 @@ builder.Services.AddInfrastructure(connectionString, builder.Configuration);
 
 builder.Services.AddOpenApi();
 
+builder.Services.ConfigureHttpJsonOptions(options =>
+    options.SerializerOptions.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter()));
+
 builder.Services.AddCors(options => options.AddDefaultPolicy(policy =>
     policy.AllowAnyOrigin()
           .AllowAnyHeader()
@@ -41,5 +44,7 @@ app.UseAuthorization();
 app.MapAuthEndpoints();
 app.MapAccountEndpoints();
 app.MapCategoryEndpoints();
+app.MapTransactionEndpoints();
+app.MapTransferEndpoints();
 
 app.Run();

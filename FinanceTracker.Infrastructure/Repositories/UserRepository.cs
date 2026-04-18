@@ -8,40 +8,27 @@ namespace FinanceTracker.Infrastructure.Repositories;
 
 public class UserRepository : IUserRepository
 {
-    private readonly IDbConnectionFactory _connectionFactory;
+    private readonly IDbSession _session;
 
-    public UserRepository(IDbConnectionFactory connectionFactory)
-    {
-        _connectionFactory = connectionFactory;
-    }
+    public UserRepository(IDbSession session) => _session = session;
 
-    public async Task<User?> GetByIdAsync(Guid id)
-    {
-        using var connection = _connectionFactory.CreateConnection();
-        return await connection.QueryFirstOrDefaultAsync<User>(SqlLoader.Load("Users.GetById"), new { Id = id });
-    }
+    public Task<User?> GetByIdAsync(Guid id) =>
+        _session.Connection.QueryFirstOrDefaultAsync<User>(
+            SqlLoader.Load("Users.GetById"), new { Id = id }, _session.Transaction);
 
-    public async Task<User?> GetByEmailAsync(string email)
-    {
-        using var connection = _connectionFactory.CreateConnection();
-        return await connection.QueryFirstOrDefaultAsync<User>(SqlLoader.Load("Users.GetByEmail"), new { Email = email });
-    }
+    public Task<User?> GetByEmailAsync(string email) =>
+        _session.Connection.QueryFirstOrDefaultAsync<User>(
+            SqlLoader.Load("Users.GetByEmail"), new { Email = email }, _session.Transaction);
 
-    public async Task<bool> ExistsAsync(string email)
-    {
-        using var connection = _connectionFactory.CreateConnection();
-        return await connection.ExecuteScalarAsync<bool>(SqlLoader.Load("Users.Exists"), new { Email = email });
-    }
+    public Task<bool> ExistsAsync(string email) =>
+        _session.Connection.ExecuteScalarAsync<bool>(
+            SqlLoader.Load("Users.Exists"), new { Email = email }, _session.Transaction);
 
-    public async Task AddAsync(User user)
-    {
-        using var connection = _connectionFactory.CreateConnection();
-        await connection.ExecuteAsync(SqlLoader.Load("Users.Insert"), user);
-    }
+    public Task AddAsync(User user) =>
+        _session.Connection.ExecuteAsync(
+            SqlLoader.Load("Users.Insert"), user, _session.Transaction);
 
-    public async Task UpdateAsync(User user)
-    {
-        using var connection = _connectionFactory.CreateConnection();
-        await connection.ExecuteAsync(SqlLoader.Load("Users.Update"), user);
-    }
+    public Task UpdateAsync(User user) =>
+        _session.Connection.ExecuteAsync(
+            SqlLoader.Load("Users.Update"), user, _session.Transaction);
 }

@@ -8,52 +8,35 @@ namespace FinanceTracker.Infrastructure.Repositories;
 
 public class BudgetRepository : IBudgetRepository
 {
-    private readonly IDbConnectionFactory _connectionFactory;
+    private readonly IDbSession _session;
 
-    public BudgetRepository(IDbConnectionFactory connectionFactory)
-    {
-        _connectionFactory = connectionFactory;
-    }
+    public BudgetRepository(IDbSession session) => _session = session;
 
-    public async Task<Budget?> GetByIdAsync(Guid id)
-    {
-        using var connection = _connectionFactory.CreateConnection();
-        return await connection.QueryFirstOrDefaultAsync<Budget>(SqlLoader.Load("Budgets.GetById"), new { Id = id });
-    }
+    public Task<Budget?> GetByIdAsync(Guid id) =>
+        _session.Connection.QueryFirstOrDefaultAsync<Budget>(
+            SqlLoader.Load("Budgets.GetById"), new { Id = id }, _session.Transaction);
 
-    public async Task<IEnumerable<Budget>> GetByUserIdAsync(Guid userId, int month, int year)
-    {
-        using var connection = _connectionFactory.CreateConnection();
-        return await connection.QueryAsync<Budget>(SqlLoader.Load("Budgets.GetByUserId"), new { UserId = userId, Month = month, Year = year });
-    }
+    public Task<IEnumerable<Budget>> GetByUserIdAsync(Guid userId, int month, int year) =>
+        _session.Connection.QueryAsync<Budget>(
+            SqlLoader.Load("Budgets.GetByUserId"), new { UserId = userId, Month = month, Year = year }, _session.Transaction);
 
-    public async Task<bool> ExistsAsync(Guid userId, Guid categoryId, int month, int year)
-    {
-        using var connection = _connectionFactory.CreateConnection();
-        return await connection.ExecuteScalarAsync<bool>(SqlLoader.Load("Budgets.Exists"), new { UserId = userId, CategoryId = categoryId, Month = month, Year = year });
-    }
+    public Task<bool> ExistsAsync(Guid userId, Guid categoryId, int month, int year) =>
+        _session.Connection.ExecuteScalarAsync<bool>(
+            SqlLoader.Load("Budgets.Exists"), new { UserId = userId, CategoryId = categoryId, Month = month, Year = year }, _session.Transaction);
 
-    public async Task<decimal> GetSpentAmountAsync(Guid userId, Guid categoryId, int month, int year)
-    {
-        using var connection = _connectionFactory.CreateConnection();
-        return await connection.ExecuteScalarAsync<decimal>(SqlLoader.Load("Budgets.GetSpentAmount"), new { UserId = userId, CategoryId = categoryId, Month = month, Year = year });
-    }
+    public Task<decimal> GetSpentAmountAsync(Guid userId, Guid categoryId, int month, int year) =>
+        _session.Connection.ExecuteScalarAsync<decimal>(
+            SqlLoader.Load("Budgets.GetSpentAmount"), new { UserId = userId, CategoryId = categoryId, Month = month, Year = year }, _session.Transaction);
 
-    public async Task AddAsync(Budget budget)
-    {
-        using var connection = _connectionFactory.CreateConnection();
-        await connection.ExecuteAsync(SqlLoader.Load("Budgets.Insert"), budget);
-    }
+    public Task AddAsync(Budget budget) =>
+        _session.Connection.ExecuteAsync(
+            SqlLoader.Load("Budgets.Insert"), budget, _session.Transaction);
 
-    public async Task UpdateAsync(Budget budget)
-    {
-        using var connection = _connectionFactory.CreateConnection();
-        await connection.ExecuteAsync(SqlLoader.Load("Budgets.Update"), budget);
-    }
+    public Task UpdateAsync(Budget budget) =>
+        _session.Connection.ExecuteAsync(
+            SqlLoader.Load("Budgets.Update"), budget, _session.Transaction);
 
-    public async Task DeleteAsync(Guid id)
-    {
-        using var connection = _connectionFactory.CreateConnection();
-        await connection.ExecuteAsync(SqlLoader.Load("Budgets.Delete"), new { Id = id });
-    }
+    public Task DeleteAsync(Guid id) =>
+        _session.Connection.ExecuteAsync(
+            SqlLoader.Load("Budgets.Delete"), new { Id = id }, _session.Transaction);
 }

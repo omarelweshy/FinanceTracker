@@ -3,6 +3,7 @@ using Confluent.Kafka;
 using FinanceTracker.Application.Interfaces;
 using FinanceTracker.Domain.Events;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
@@ -13,8 +14,9 @@ public class KafkaConsumerService : BackgroundService
     private readonly KafkaSettings _settings;
     private readonly IServiceScopeFactory _scopeFactory;
     private readonly ILogger<KafkaConsumerService> _logger;
+    private static readonly JsonSerializerOptions _jsonOptions = new() { PropertyNameCaseInsensitive = true };
 
-    private static readonly string[] Topics = ["UserRegisteredEvent"];
+    private static readonly string[] Topics = ["UserRegisteredEvent", "TransactionCreatedEvent"];
 
     public KafkaConsumerService(KafkaSettings settings, IServiceScopeFactory scopeFactory, ILogger<KafkaConsumerService> logger)
     {
@@ -75,10 +77,13 @@ public class KafkaConsumerService : BackgroundService
         switch (topic)
         {
             case "UserRegisteredEvent":
-                var @event = JsonSerializer.Deserialize<UserRegisteredEvent>(json,
-                    new JsonSerializerOptions { PropertyNameCaseInsensitive = true })!;
-                var handler = sp.GetRequiredService<IEventHandler<UserRegisteredEvent>>();
-                await handler.HandleAsync(@event, ct);
+                var userEvent = JsonSerializer.Deserialize<UserRegisteredEvent>(json, _jsonOptions)!;
+                await sp.GetRequiredService<IEventHandler<UserRegisteredEvent>>().HandleAsync(userEvent, ct);
+                break;
+
+            case "TransactionCreatedEvent":
+                var txEvent = JsonSerializer.Deserialize<TransactionCreatedEvent>(json, _jsonOptions)!;
+                await sp.GetRequiredService<IEventHandler<TransactionCreatedEvent>>().HandleAsync(txEvent, ct);
                 break;
 
             default:

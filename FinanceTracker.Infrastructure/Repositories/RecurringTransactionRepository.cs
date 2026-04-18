@@ -8,46 +8,31 @@ namespace FinanceTracker.Infrastructure.Repositories;
 
 public class RecurringTransactionRepository : IRecurringTransactionRepository
 {
-    private readonly IDbConnectionFactory _connectionFactory;
+    private readonly IDbSession _session;
 
-    public RecurringTransactionRepository(IDbConnectionFactory connectionFactory)
-    {
-        _connectionFactory = connectionFactory;
-    }
+    public RecurringTransactionRepository(IDbSession session) => _session = session;
 
-    public async Task<RecurringTransaction?> GetByIdAsync(Guid id)
-    {
-        using var connection = _connectionFactory.CreateConnection();
-        return await connection.QueryFirstOrDefaultAsync<RecurringTransaction>(SqlLoader.Load("RecurringTransactions.GetById"), new { Id = id });
-    }
+    public Task<RecurringTransaction?> GetByIdAsync(Guid id) =>
+        _session.Connection.QueryFirstOrDefaultAsync<RecurringTransaction>(
+            SqlLoader.Load("RecurringTransactions.GetById"), new { Id = id }, _session.Transaction);
 
-    public async Task<IEnumerable<RecurringTransaction>> GetByUserIdAsync(Guid userId)
-    {
-        using var connection = _connectionFactory.CreateConnection();
-        return await connection.QueryAsync<RecurringTransaction>(SqlLoader.Load("RecurringTransactions.GetByUserId"), new { UserId = userId });
-    }
+    public Task<IEnumerable<RecurringTransaction>> GetByUserIdAsync(Guid userId) =>
+        _session.Connection.QueryAsync<RecurringTransaction>(
+            SqlLoader.Load("RecurringTransactions.GetByUserId"), new { UserId = userId }, _session.Transaction);
 
-    public async Task<IEnumerable<RecurringTransaction>> GetPendingAsync(DateTime asOf)
-    {
-        using var connection = _connectionFactory.CreateConnection();
-        return await connection.QueryAsync<RecurringTransaction>(SqlLoader.Load("RecurringTransactions.GetPending"), new { AsOf = asOf });
-    }
+    public Task<IEnumerable<RecurringTransaction>> GetPendingAsync(DateTime asOf) =>
+        _session.Connection.QueryAsync<RecurringTransaction>(
+            SqlLoader.Load("RecurringTransactions.GetPending"), new { AsOf = asOf }, _session.Transaction);
 
-    public async Task AddAsync(RecurringTransaction recurringTransaction)
-    {
-        using var connection = _connectionFactory.CreateConnection();
-        await connection.ExecuteAsync(SqlLoader.Load("RecurringTransactions.Insert"), recurringTransaction);
-    }
+    public Task AddAsync(RecurringTransaction recurringTransaction) =>
+        _session.Connection.ExecuteAsync(
+            SqlLoader.Load("RecurringTransactions.Insert"), recurringTransaction, _session.Transaction);
 
-    public async Task UpdateAsync(RecurringTransaction recurringTransaction)
-    {
-        using var connection = _connectionFactory.CreateConnection();
-        await connection.ExecuteAsync(SqlLoader.Load("RecurringTransactions.Update"), recurringTransaction);
-    }
+    public Task UpdateAsync(RecurringTransaction recurringTransaction) =>
+        _session.Connection.ExecuteAsync(
+            SqlLoader.Load("RecurringTransactions.Update"), recurringTransaction, _session.Transaction);
 
-    public async Task DeleteAsync(Guid id)
-    {
-        using var connection = _connectionFactory.CreateConnection();
-        await connection.ExecuteAsync(SqlLoader.Load("RecurringTransactions.Delete"), new { Id = id });
-    }
+    public Task DeleteAsync(Guid id) =>
+        _session.Connection.ExecuteAsync(
+            SqlLoader.Load("RecurringTransactions.Delete"), new { Id = id }, _session.Transaction);
 }

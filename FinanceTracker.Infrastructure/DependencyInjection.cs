@@ -4,8 +4,12 @@ using FinanceTracker.Application.Interfaces;
 using FinanceTracker.Domain.Interfaces;
 using FinanceTracker.Infrastructure.Database;
 using FinanceTracker.Application.Features.Auth.Events;
+using FinanceTracker.Application.Features.Transactions.Events;
+using FinanceTracker.Application.Interfaces;
 using FinanceTracker.Domain.Events;
+using FinanceTracker.Infrastructure.Database;
 using FinanceTracker.Infrastructure.Messaging;
+using FinanceTracker.Infrastructure.Repositories.Queries;
 using FinanceTracker.Infrastructure.Repositories;
 using FinanceTracker.Infrastructure.Security;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -22,6 +26,9 @@ public static class DependencyInjection
         DefaultTypeMap.MatchNamesWithUnderscores = true;
 
         services.AddSingleton<IDbConnectionFactory>(_ => new DbConnectionFactory(connectionString));
+        services.AddScoped<IDbSession, DbSession>();
+        services.AddScoped<ITransactionQuery, TransactionQueryRepository>();
+        services.AddScoped<ITransferQuery, TransferQueryRepository>();
 
         services.AddScoped<IUserRepository, UserRepository>();
         services.AddScoped<IAccountRepository, AccountRepository>();
@@ -58,6 +65,7 @@ public static class DependencyInjection
         services.AddSingleton(kafkaSettings);
         services.AddSingleton<IEventBus, KafkaEventBus>();
         services.AddScoped<IEventHandler<UserRegisteredEvent>, UserRegisteredEventHandler>();
+        services.AddScoped<IEventHandler<TransactionCreatedEvent>, TransactionCreatedEventHandler>();
         services.AddHostedService<KafkaConsumerService>();
 
         return services;
