@@ -45,7 +45,7 @@ services:
     image: provectuslabs/kafka-ui:latest
     container_name: financetracker_kafka_ui
     ports:
-      - "8090:8080"
+      - "8091:8080"
     environment:
       KAFKA_CLUSTERS_0_NAME: "financetracker"
       KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: "kafka:9092"
