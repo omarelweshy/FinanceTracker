@@ -1,6 +1,7 @@
 using FinanceTracker.Application.Common.DTOs;
 using FinanceTracker.Application.Interfaces;
 using FinanceTracker.Domain.Entities;
+using FinanceTracker.Domain.Events;
 using FinanceTracker.Domain.Exceptions;
 using FinanceTracker.Domain.Interfaces;
 using MediatR;
@@ -13,14 +14,16 @@ public class RegisterCommandHandler : IRequestHandler<RegisterCommand, AuthRespo
     private readonly IPasswordHasher _passwordHasher;
     private readonly ITokenService _tokenService;
     private readonly ICategorySeeder _categorySeeder;
+    private readonly IEventBus _eventBus;
 
     public RegisterCommandHandler(IUserRepository userRepository, IPasswordHasher passwordHasher,
-        ITokenService tokenService, ICategorySeeder categorySeeder)
+        ITokenService tokenService, ICategorySeeder categorySeeder, IEventBus eventBus)
     {
         _userRepository = userRepository;
         _passwordHasher = passwordHasher;
         _tokenService = tokenService;
         _categorySeeder = categorySeeder;
+        _eventBus = eventBus;
     }
 
     public async Task<AuthResponse> Handle(RegisterCommand request, CancellationToken cancellationToken)
@@ -33,6 +36,7 @@ public class RegisterCommandHandler : IRequestHandler<RegisterCommand, AuthRespo
 
         await _userRepository.AddAsync(user);
         await _categorySeeder.SeedAsync(user.Id);
+        await _eventBus.PublishAsync(new UserRegisteredEvent(user.Id, user.Email, user.FullName, user.Currency), cancellationToken);
 
         var token = _tokenService.GenerateToken(user);
         return new AuthResponse(user.Id, user.Email, user.FullName, user.Currency, token);

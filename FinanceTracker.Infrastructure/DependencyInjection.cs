@@ -3,6 +3,7 @@ using Dapper;
 using FinanceTracker.Application.Interfaces;
 using FinanceTracker.Domain.Interfaces;
 using FinanceTracker.Infrastructure.Database;
+using FinanceTracker.Infrastructure.Messaging;
 using FinanceTracker.Infrastructure.Repositories;
 using FinanceTracker.Infrastructure.Security;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -50,6 +51,11 @@ public static class DependencyInjection
             });
 
         services.AddAuthorization();
+
+        var kafkaSettings = configuration.GetSection("Kafka").Get<KafkaSettings>() ?? new KafkaSettings();
+        services.AddSingleton(kafkaSettings);
+        services.AddSingleton<IEventBus, KafkaEventBus>();
+        services.AddHostedService<KafkaConsumerService>();
 
         return services;
     }
