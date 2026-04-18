@@ -1,3 +1,4 @@
+using FinanceTracker.Application.Common.Behaviors;
 using FinanceTracker.Application.Common.DTOs;
 using MediatR;
 
@@ -10,4 +11,4 @@ public record CreateTransferCommand(
     decimal Amount,
     DateTime TransferDate,
     string? Note
-) : IRequest<TransferDto>;
+) : IRequest<TransferDto>, ITransactionalRequest;

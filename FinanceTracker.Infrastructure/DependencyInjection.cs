@@ -26,7 +26,9 @@ public static class DependencyInjection
         DefaultTypeMap.MatchNamesWithUnderscores = true;
 
         services.AddSingleton<IDbConnectionFactory>(_ => new DbConnectionFactory(connectionString));
-        services.AddScoped<IDbSession, DbSession>();
+        services.AddScoped<DbSession>();
+        services.AddScoped<IUnitOfWork>(sp => sp.GetRequiredService<DbSession>());
+        services.AddScoped<IDbSession>(sp => sp.GetRequiredService<DbSession>());
         services.AddScoped<ITransactionQuery, TransactionQueryRepository>();
         services.AddScoped<ITransferQuery, TransferQueryRepository>();
 

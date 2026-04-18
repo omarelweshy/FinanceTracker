@@ -1,5 +1,4 @@
 using Dapper;
-using FinanceTracker.Application.Interfaces;
 using FinanceTracker.Domain.Entities;
 using FinanceTracker.Domain.Interfaces;
 using FinanceTracker.Infrastructure.Database;

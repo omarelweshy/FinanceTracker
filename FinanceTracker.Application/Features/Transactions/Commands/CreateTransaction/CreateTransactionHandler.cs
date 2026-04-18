@@ -11,13 +11,13 @@ namespace FinanceTracker.Application.Features.Transactions.Commands.CreateTransa
 
 public class CreateTransactionHandler : IRequestHandler<CreateTransactionCommand, TransactionDto>
 {
-    private readonly IDbSession _session;
+    private readonly IUnitOfWork _session;
     private readonly IAccountRepository _accounts;
     private readonly ITransactionRepository _transactions;
     private readonly ITransactionQuery _query;
     private readonly IEventBus _eventBus;
 
-    public CreateTransactionHandler(IDbSession session, IAccountRepository accounts,
+    public CreateTransactionHandler(IUnitOfWork session, IAccountRepository accounts,
         ITransactionRepository transactions, ITransactionQuery query, IEventBus eventBus)
     {
         _session = session;
